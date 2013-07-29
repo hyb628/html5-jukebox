@@ -4,6 +4,7 @@ var ready = false;
 var state;
 var previousVolume;
 var playing;
+var playState = false;
 
 var play = document.querySelector('.play');
 var forward = document.querySelector('.forward');
@@ -39,15 +40,17 @@ function playTrack(track) {
 }
 
 function startAudio() {
-  if(audio.src) {
-    audio.play();
-    state = setInterval(updateState, 1000);
-  } else {
+  if(!playState) {
+    playState = true;
     playTrack(track);
+  } else {
+    audio.play();
+    state = setInterval(updateState, 100);
   }
 }
 
 function stopAudio() {
+  playState = false;
   audio.pause();
   clearInterval(state);
 }
@@ -67,8 +70,14 @@ function initState() {
 }
 
 function updateState() {
-  formatTime(audio.currentTime, elapsed);
-  updateProgress(audio.currentTime, audio.duration);
+  if(playState) {
+    if(audio.paused && audio.currentTime === audio.duration) {
+      forwardAction();
+    } else {
+      formatTime(audio.currentTime, elapsed);
+      updateProgress(audio.currentTime, audio.duration);
+    }
+  }
 }
 
 function updateProgress(elapsedTime, totalTime) {
@@ -151,12 +160,15 @@ function toggleRepeat() {
   switch(true) {
     case repeat.dataset.state == 'off':
       repeat.dataset.state = 'on';
+      audio.loop = false;
       break;
     case repeat.dataset.state == 'on':
       repeat.dataset.state = 'one';
+      audio.loop = true;
       break;
     default:
       repeat.dataset.state = 'off';
+      audio.loop = false;
   }
 }
 
@@ -190,12 +202,21 @@ function playAction() {
 }
 
 function forwardAction() {
-  if(++track == songs.length) {
+  if(track == songs.length - 1 && repeat.dataset.state == 'off') {
     track = 0;
+    play.classList.remove('on');
+    play.classList.add('off');
+    playing = list.querySelector('.playing');
+    if(playing) {
+      playing.className = '';
+    }
+    stopAudio();
+  } else {
+    track = (track == songs.length - 1) ? 0 : track + 1;
+    play.classList.remove('off');
+    play.classList.add('on');
+    playTrack(track);
   }
-  play.classList.remove('off');
-  play.classList.add('on');
-  playTrack(track);
 }
 
 function generateList() {
