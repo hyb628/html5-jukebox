@@ -201,7 +201,7 @@ function forwardAction() {
 function generateList() {
   var tmpl = '<li><span class="artist">{{artist}}</span><span class="title">{{title}}</span></li>';
   var ul = document.createElement('ul');
-  front(songs, ul, tmpl);
+  front(tmpl, songs, ul);
   list.appendChild(ul);
 }
 
