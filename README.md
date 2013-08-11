@@ -4,6 +4,7 @@ HTML5 Jukebox
 **About this repo**
 
 + An online audio player written in HTML5.
++ This project is released under the [MIT license](http://opensource.org/licenses/MIT).
 
 
 **Read the blog post**
